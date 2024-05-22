@@ -22,7 +22,6 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   </div>
-
-  <mat-paginator [pageSizeOptions]="[10, 20, 30]" (page)="pageChanged($event)" [length]="totalCount" [pageSize]="pageSize">
+  <mat-paginator (page)="pageChanged($event)" [length]="totalCount" [pageSize]="30">
   </mat-paginator>
 </section>
