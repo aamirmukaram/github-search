@@ -1,17 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, combineLatest, forkJoin, lastValueFrom } from 'rxjs';
 import { GitHubService } from './github.service';
 import { map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { GitHubSearchReposResponse, GitHubReposGetResponse } from './github.service';
 
-export interface SearchRepositories {
+export interface SearchRepositry {
   name: string;
   avatarUrl: string;
   creationDate: string;
 }
 
 export interface SearchRepositoriesResponse {
-  items: SearchRepositories[];
+  items: SearchRepositry[];
 }
 
 export interface SearchRepositoriesRequest {
@@ -25,8 +25,7 @@ export interface SearchRepositoriesRequest {
   providedIn: 'root'
 })
 export class SearchRepoService {
-
-  constructor(private gitHubService: GitHubService) { }
+  private gitHubService = inject(GitHubService);
 
   searchRepositories(
     {

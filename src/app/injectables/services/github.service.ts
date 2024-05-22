@@ -13,6 +13,9 @@ export type GitHubSearchIssuesAndPullRequestsResponse = RestEndpointMethodTypes[
 export type GitHubReposGetParams = RestEndpointMethodTypes['repos']['get']['parameters'];
 export type GitHubReposGetResponse = RestEndpointMethodTypes['repos']['get']['response'];
 
+export type GitHubSearchCommitsParams = RestEndpointMethodTypes['search']['commits']['parameters'];
+export type GitHubSearchCommitsResponse = RestEndpointMethodTypes['search']['commits']['response'];
+
 
 @Injectable({
   providedIn: 'root'
@@ -32,5 +35,9 @@ export class GitHubService {
 
   getRepository(params: GitHubReposGetParams): Observable<GitHubReposGetResponse> {
     return from(this.octokit.repos.get(params));
+  }
+
+  listCommits(params: GitHubSearchCommitsParams): Observable<GitHubSearchCommitsResponse> {
+    return from(this.octokit.search.commits(params));
   }
 }
