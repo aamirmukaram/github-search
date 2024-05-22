@@ -38,6 +38,7 @@ export class GitHubService {
   }
 
   listCommits(params: GitHubSearchCommitsParams): Observable<GitHubSearchCommitsResponse> {
+    console.log('params', params);
     return from(this.octokit.search.commits(params));
   }
 }

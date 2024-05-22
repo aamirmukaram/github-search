@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { inject } from '@angular/core';
-import { GitHubService } from './github.service';
+import { GitHubService } from '../../injectables/services/github.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { GitHubSearchCommitsResponse } from './github.service';
+import { GitHubSearchCommitsResponse } from '../../injectables/services/github.service';
 
 export interface SearchCommit {
   name: string;
@@ -13,26 +13,27 @@ export interface SearchCommit {
 
 export interface SearchCommitsResponse {
   items: SearchCommit[];
+  totalCount: number;
 }
 
 export interface SearchCommitsRequest {
   owner: string;
   repo: string;
   searchTerm: string;
+  perPage: number;
+  page: number;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
-export class SearchCommitService {
+@Injectable()
+export class CommitsService {
   private gitHubService = inject(GitHubService);
 
-  searchCommits({ searchTerm, owner, repo }: SearchCommitsRequest): Observable<SearchCommitsResponse> {
+  searchCommits({ searchTerm, owner, repo, perPage, page }: SearchCommitsRequest): Observable<SearchCommitsResponse> {
     let query = searchTerm;
-    return this.gitHubService.listCommits({ q: `${query} repo:${owner}/${repo}` })
-    .pipe(
-      map(this.mapSearchCommitsData)
-    );
+    return this.gitHubService.listCommits({ q: `${query} repo:${owner}/${repo}`, per_page: perPage, page })
+      .pipe(
+        map(this.mapSearchCommitsData)
+      );
   }
 
   mapSearchCommitsData(response: GitHubSearchCommitsResponse): SearchCommitsResponse {
@@ -41,6 +42,6 @@ export class SearchCommitService {
       url: item.html_url,
       message: item.commit.message,
     }));
-    return ({ items });
+    return ({ items, totalCount: response.data.total_count });
   }
 }

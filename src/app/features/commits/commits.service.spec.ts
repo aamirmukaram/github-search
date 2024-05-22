@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SearchCommitService } from './search-commit.service';
+import { CommitsService } from './commits.service';
 
-describe('SearchCommitService', () => {
-  let service: SearchCommitService;
+describe('CommitsService', () => {
+  let service: CommitsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(SearchCommitService);
+    service = TestBed.inject(CommitsService);
   });
 
   it('should be created', () => {
