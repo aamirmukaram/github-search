@@ -1,6 +1,15 @@
 <section>
-  <h1>Commits</h1>
-  
+  <h1>Commits for {{urlParams['owner']}}/{{urlParams['repo']}}</h1>
+  <mat-card>
+    <mat-card-content>
+      <h2>Filter</h2>
+      <mat-form-field>
+        <mat-label>Search commit</mat-label>
+        <input (ngModelChange)="pageChanged()" [(ngModel)]="searchTerm" matInput placeholder="Enter search term">
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
   <div>
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
       <ng-container matColumnDef="name">
@@ -22,6 +31,6 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   </div>
-  <mat-paginator (page)="pageChanged($event)" [length]="totalCount" [pageSize]="pageSize">
+  <mat-paginator (page)="pageChanged()" [length]="totalCount" [pageSize]="pageSize">
   </mat-paginator>
 </section>

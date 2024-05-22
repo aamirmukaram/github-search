@@ -3,11 +3,13 @@ import { CommitsService, SearchCommit, SearchCommitsRequest } from './commits.se
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent, MatPaginator } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
-
+import { MatCardModule } from '@angular/material/card';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-commits',
   standalone: true,
-  imports: [MatTableModule, MatPaginatorModule],
+  imports: [FormsModule, MatInputModule, MatTableModule, MatPaginatorModule, MatCardModule],
   templateUrl: './commits.component.html',
   styleUrls: ['./commits.component.scss'],
   providers: [CommitsService]
@@ -20,10 +22,12 @@ export class CommitsComponent implements AfterViewInit {
   dataSource: SearchCommit[] = []; 
   totalCount = 0;
   pageSize = 30;
-  private urlParams = this.activatedRoute.snapshot.params;
+  urlParams = this.activatedRoute.snapshot.params;
+  searchTerm = 'angular'
+  pageEvent!: PageEvent;
 
-  fetchTableData(request: SearchCommitsRequest) {
-    this.commitsService.searchCommits(request)
+  private fetchTableData(request: SearchCommitsRequest) {
+    this.commitsService.listCommits(request)
       .subscribe(commits => {
         this.totalCount = commits.totalCount;
         this.dataSource = commits.items;
@@ -32,7 +36,7 @@ export class CommitsComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.fetchTableData({
-      searchTerm: 'angular',
+      searchTerm: this.searchTerm || 'angular',
       owner: this.urlParams['owner'],
       repo: this.urlParams['repo'],
       page: 1,
@@ -40,13 +44,13 @@ export class CommitsComponent implements AfterViewInit {
     });
   }
 
-  pageChanged(event: PageEvent) {
+  pageChanged() {
     this.fetchTableData({
-      searchTerm: 'angular',
+      searchTerm: this.searchTerm || 'angular',
       owner: this.urlParams['owner'],
       repo: this.urlParams['repo'],
-      page: event.pageIndex + 1,
-      perPage: event.pageSize
+      page: this.paginator.pageIndex + 1,
+      perPage: this.paginator.pageSize
     });
   }
 }
