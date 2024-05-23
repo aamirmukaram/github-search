@@ -23,6 +23,12 @@ export interface SearchRepositoriesRequest {
   perPage: number;
 }
 
+export interface SearchRepositoriesByIssueTitleRequest {
+  name: string;
+  page: number;
+  perPage: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -52,8 +58,8 @@ export class ReposService {
       .pipe(map(this.mapSearchRepositoriesData));
   }
 
-  searchRepositoriesByIssueTitle(query?: string): Observable<any> {
-    return this.gitHubService.searchIssuesAndPullRequests({ q: `${query} in:title` }).pipe(
+  searchRepositoriesByIssueTitle({ name: query, page, perPage }: SearchRepositoriesByIssueTitleRequest): Observable<SearchRepositoriesResponse> {
+    return this.gitHubService.searchIssuesAndPullRequests({ q: `${query} in:title`, per_page: 100, page }).pipe(
       map(searchResult => Array.from(new Set(searchResult.data.items.map(item => item.repository_url)))),
       map(uniqueUrls => uniqueUrls.map(url => {
         const [, , , , owner, repo] = url.split('/');

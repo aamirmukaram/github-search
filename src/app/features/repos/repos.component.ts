@@ -9,10 +9,10 @@ import { ReposService } from './repos.service';
 import { SearchRepositry } from './repos.service';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Validators } from '@angular/forms';
-import { OnInit } from '@angular/core';
 import { SearchRepositoriesRequest } from './repos.service';
 import { FormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { SearchRepositoriesByIssueTitleRequest } from './repos.service';
 
 @Component({
   selector: 'app-repos',
@@ -21,7 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './repos.component.html',
   styleUrl: './repos.component.scss'
 })
-export class ReposComponent implements OnInit {
+export class ReposComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   private reposService = inject(ReposService);
   private formBuilder = inject(FormBuilder);
@@ -29,17 +29,30 @@ export class ReposComponent implements OnInit {
   dataSource: SearchRepositry[] = [];
   totalCount = 0;
   pageSize = 30;
-  searchForm!: FormGroup;
+  searchForm: FormGroup = this.formBuilder.group({
+    name: ['', Validators.required],
+    language: [''],
+    minStars: ['']
+  });
+  searchRepositoriesByIssueTitle = false;
 
-  ngOnInit() {
-    this.searchForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      language: [''],
-      minStars: ['']
-    });
+  searchByIssueTitleForm: FormGroup = this.formBuilder.group({
+    name: ['', Validators.required],
+  });
+
+  searchByIssueTitleButtonClicked() {
+    this.searchRepositoriesByIssueTitle = true;
+    const formValue = this.searchByIssueTitleForm.value;
+    const name = formValue['name'];
+
+    if (!name) {
+      return;
+    }
+    this.fetchReposByIssueTitleData({ name, page: 1, perPage: this.paginator.pageSize });
   }
 
   searchButtonClicked() {
+    this.searchRepositoriesByIssueTitle = false;
     const formValue = this.searchForm.value;
     const name = formValue['name'];
     const language = formValue['language'];
@@ -58,10 +71,10 @@ export class ReposComponent implements OnInit {
     if (minStars) {
       request['minStars'] = minStars;
     }
-    this.fetchTableData(request);
+    this.fetchReposData(request);
   }
 
-  private fetchTableData(request: SearchRepositoriesRequest) {
+  private fetchReposData(request: SearchRepositoriesRequest) {
     this.reposService.searchRepositories(request)
       .subscribe(repos => {
         this.totalCount = repos.totalCount;
@@ -69,7 +82,25 @@ export class ReposComponent implements OnInit {
       });
   }
 
+  private fetchReposByIssueTitleData(request: SearchRepositoriesByIssueTitleRequest) {
+    this.reposService.searchRepositoriesByIssueTitle(request)
+      .subscribe(repos => {
+        this.totalCount = repos.totalCount;
+        this.dataSource = repos.items;
+      });
+  }
+
   pageChanged() {
+    if (this.searchRepositoriesByIssueTitle) {
+      const formValue = this.searchByIssueTitleForm.value;
+      const name = formValue['name'];
+  
+      if (!name) {
+        return;
+      }
+      this.fetchReposByIssueTitleData({ name, page: this.paginator.pageIndex + 1, perPage: this.paginator.pageSize });
+      return;
+    }
     const formValue = this.searchForm.value;
     const name = formValue['name'];
     const language = formValue['language'];
@@ -88,6 +119,6 @@ export class ReposComponent implements OnInit {
     if (minStars) {
       request['minStars'] = minStars;
     }
-    this.fetchTableData(request);
+    this.fetchReposData(request);
   }
 }
