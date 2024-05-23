@@ -23,7 +23,7 @@ export class CommitsComponent implements AfterViewInit {
   totalCount = 0;
   pageSize = 30;
   urlParams = this.activatedRoute.snapshot.params;
-  searchTerm = 'angular'
+  searchTerm = ''
 
   private fetchTableData(request: SearchCommitsRequest) {
     this.commitsService.listCommits(request)

@@ -8,6 +8,8 @@ export interface SearchRepositry {
   name: string;
   avatarUrl: string;
   creationDate: string;
+  owner: string;
+  repo: string;
 }
 
 export interface SearchRepositoriesResponse {
@@ -72,20 +74,30 @@ export class ReposService {
   }
 
   mapSearchRepositoriesByIssueTitleData(response: GitHubReposGetResponse[]): SearchRepositoriesResponse {
-    const items = response.map(({ data: item }) => ({
-      name: item.name,
-      avatarUrl: item.owner?.avatar_url ?? '',
-      creationDate: item.created_at
-    }));
+    const items = response.map(({ data: item }) => {
+      const [, , , , owner, repo] = item.url.split('/');
+      return ({
+        name: item.name,
+        avatarUrl: item.owner?.avatar_url ?? '',
+        creationDate: item.created_at,
+        owner,
+        repo
+      });
+    });
     return ({ items, totalCount: items.length });
   }
 
   mapSearchRepositoriesData(response: GitHubSearchReposResponse): SearchRepositoriesResponse {
-    const items = response.data.items.map(item => ({
-      name: item.name,
-      avatarUrl: item.owner?.avatar_url ?? '',
-      creationDate: item.created_at
-    }));
+    const items = response.data.items.map(item => {
+      const [, , , , owner, repo] = item.url.split('/');
+      return ({
+        name: item.name,
+        avatarUrl: item.owner?.avatar_url ?? '',
+        creationDate: item.created_at,
+        repo,
+        owner
+      });
+    });
     return ({ items, totalCount: response.data.total_count });
   }
 }

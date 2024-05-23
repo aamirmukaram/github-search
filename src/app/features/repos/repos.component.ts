@@ -13,11 +13,13 @@ import { SearchRepositoriesRequest } from './repos.service';
 import { FormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { SearchRepositoriesByIssueTitleRequest } from './repos.service';
+import { Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-repos',
   standalone: true,
-  imports: [MatInputModule, MatTableModule, MatPaginatorModule, MatCardModule, ReactiveFormsModule, MatButtonModule],
+  imports: [DatePipe, MatInputModule, MatTableModule, MatPaginatorModule, MatCardModule, ReactiveFormsModule, MatButtonModule],
   templateUrl: './repos.component.html',
   styleUrl: './repos.component.scss'
 })
@@ -25,6 +27,7 @@ export class ReposComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   private reposService = inject(ReposService);
   private formBuilder = inject(FormBuilder);
+  private router = inject(Router);
   displayedColumns: string[] = ['avatarUrl', 'name', 'creationDate'];
   dataSource: SearchRepositry[] = [];
   totalCount = 0;
@@ -120,5 +123,9 @@ export class ReposComponent {
       request['minStars'] = minStars;
     }
     this.fetchReposData(request);
+  }
+
+  tableRowClicked(row: SearchRepositry) {
+    this.router.navigate(['/commits', row.owner, row.repo]);
   }
 }
