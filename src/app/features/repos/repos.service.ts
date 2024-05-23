@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, combineLatest, forkJoin, lastValueFrom } from 'rxjs';
-import { GitHubService } from './github.service';
+import { GitHubService } from '../../injectables/services/github.service';
 import { map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
-import { GitHubSearchReposResponse, GitHubReposGetResponse } from './github.service';
+import { GitHubSearchReposResponse, GitHubReposGetResponse } from '../../injectables/services/github.service';
 
 export interface SearchRepositry {
   name: string;
@@ -12,19 +12,21 @@ export interface SearchRepositry {
 
 export interface SearchRepositoriesResponse {
   items: SearchRepositry[];
+  totalCount: number;
 }
 
 export interface SearchRepositoriesRequest {
   name: string;
-  perPage?: number;
   language?: string;
-  minStars?: number;
+  minStars?: string;
+  page: number;
+  perPage: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class SearchRepoService {
+export class ReposService {
   private gitHubService = inject(GitHubService);
 
   searchRepositories(
@@ -32,7 +34,8 @@ export class SearchRepoService {
       name,
       language,
       minStars,
-      perPage = 30
+      perPage,
+      page
     }: SearchRepositoriesRequest
   ): Observable<SearchRepositoriesResponse> {
     let query = name;
@@ -45,7 +48,7 @@ export class SearchRepoService {
       query += ` sort:stars order:desc`;
     }
 
-    return this.gitHubService.searchRepositories({ q: query, per_page: perPage })
+    return this.gitHubService.searchRepositories({ q: query, per_page: perPage, page})
       .pipe(map(this.mapSearchRepositoriesData));
   }
 
@@ -68,7 +71,7 @@ export class SearchRepoService {
       avatarUrl: item.owner?.avatar_url ?? '',
       creationDate: item.created_at
     }));
-    return ({ items });
+    return ({ items, totalCount: items.length });
   }
 
   mapSearchRepositoriesData(response: GitHubSearchReposResponse): SearchRepositoriesResponse {
@@ -77,6 +80,6 @@ export class SearchRepoService {
       avatarUrl: item.owner?.avatar_url ?? '',
       creationDate: item.created_at
     }));
-    return ({ items });
+    return ({ items, totalCount: response.data.total_count });
   }
 }

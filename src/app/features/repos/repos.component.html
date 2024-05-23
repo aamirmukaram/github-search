@@ -1,1 +1,58 @@
-<p>repos works!</p>
+<section>
+    <h1>Repos</h1>
+    <mat-card class="mb-3">
+      <mat-card-content>
+        <h2>Filter</h2>
+
+        <form [formGroup]="searchForm" (ngSubmit)="searchButtonClicked()">
+            <mat-form-field class="mr-3">
+                <mat-label>Search repo by name</mat-label>
+                <input formControlName="name" matInput placeholder="Enter search term">
+              </mat-form-field>
+
+              <mat-form-field class="mr-3">
+                <mat-label>Search repo by language</mat-label>
+                <input formControlName="language" matInput placeholder="Enter search term">
+              </mat-form-field>
+
+              <mat-form-field class="mr-3">
+                <mat-label>Search repo by minimum number of stars</mat-label>
+                <input type="number" formControlName="minStars" matInput placeholder="Enter search term">
+              </mat-form-field>
+
+              <mat-form-field class="mr-3">
+                <mat-label>Search repo by text containing in title of commit</mat-label>
+                <input matInput placeholder="Enter search term">
+              </mat-form-field>
+
+              <button type="submit" mat-flat-button color="primary">Search</button>
+        </form>
+        
+      </mat-card-content>
+    </mat-card>
+  
+    <div>
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <ng-container matColumnDef="avatarUrl">
+          <th mat-header-cell *matHeaderCellDef> Avatar </th>
+          <td mat-cell *matCellDef="let commit"> {{commit.avatarUrl}} </td>
+        </ng-container>
+      
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Name </th>
+          <td mat-cell *matCellDef="let commit"> {{commit.name}} </td>
+        </ng-container>
+      
+        <ng-container matColumnDef="creationDate">
+          <th mat-header-cell *matHeaderCellDef> Creation Date </th>
+          <td mat-cell *matCellDef="let commit"> {{commit.creationDate}} </td>
+        </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+    <mat-paginator (page)="pageChanged()" [length]="totalCount" [pageSize]="pageSize">
+    </mat-paginator>
+  </section>
+  
